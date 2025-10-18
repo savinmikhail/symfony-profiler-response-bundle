@@ -2,7 +2,7 @@ cs:
 	PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --diff --verbose
 
 phpstan:
-	vendor/bin/phpstan
+	php -d memory_limit=768M vendor/bin/phpstan analyse --ansi -c phpstan.neon.dist
 
 test:
 	vendor/bin/phpunit

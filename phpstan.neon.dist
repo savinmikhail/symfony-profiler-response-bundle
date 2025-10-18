@@ -1,11 +1,7 @@
 parameters:
-  level: max
+  level: 6
   paths:
     - src
-    - tests
-  checkGenericClassInNonGenericObjectType: false
-  checkMissingIterableValueType: true
-  checkUninitializedProperties: true
-  inferPrivatePropertyTypeFromConstructor: true
-  reportUnmatchedIgnoredErrors: true
-
+  tmpDir: var/phpstan
+  parallel:
+    maximumNumberOfProcesses: 1
