@@ -1,4 +1,6 @@
-![dist-size status](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsavinmikhail%2Fdist-size-optimizer%2Fmain%2Fdist-size-status.json)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/savinmikhail/symfony-profiler-response-bundle/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/savinmikhail/symfony-profiler-response-bundle/?branch=main)
+[![Code Coverage](https://scrutinizer-ci.com/g/savinmikhail/symfony-profiler-response-bundle/badges/coverage.png?b=main)](https://scrutinizer-ci.com/g/savinmikhail/symfony-profiler-response-bundle/?branch=main)
+![dist-size status](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsavinmikhail%2Fsymfony-profiler-response-bundle%2Fmain%2Fdist-size-status.json)
 
 ## Symfony Profiler Response Bundle
 
