@@ -51,28 +51,12 @@ final class TestKernel extends Kernel
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->add(name: 'json', path: '/json')->controller(controller: static fn(): Response => new JsonResponse(data: ['hello' => 'world', 'answer' => 42]));
-
-        $routes->add(name: 'text', path: '/text')->controller(controller: static fn(): Response => new Response(content: 'plain text body', headers: ['Content-Type' => 'text/plain']));
-
-        $routes->add(name: 'pdf', path: '/pdf')->controller(controller: static fn(): Response => new Response(content: '%PDF-1.4 binary data', headers: ['Content-Type' => 'application/pdf']));
-
-        $routes->add(name: 'binary', path: '/binary')->controller(controller: static function (): Response {
-            $file = sys_get_temp_dir() . '/rf_binary_test_' . uniqid(more_entropy: true) . '.bin';
-            file_put_contents(filename: $file, data: random_bytes(length: 16));
-
-            return new BinaryFileResponse(file: $file);
-        });
-
-        $routes->add(name: 'stream', path: '/stream')->controller(controller: static fn(): Response => new StreamedResponse(callbackOrChunks: static function (): void {
-            echo 'streamed';
-        }));
-
-        $routes->add(name: 'bigjson', path: '/bigjson')->controller(controller: static function (): Response {
-            $payload = ['chunk' => str_repeat(string: 'A', times: 3_000)];
-
-            return new JsonResponse(data: $payload);
-        });
+        $routes->add('json', '/json')->controller('Tests\\Functional\\Controller\\TestController::json');
+        $routes->add('text', '/text')->controller('Tests\\Functional\\Controller\\TestController::text');
+        $routes->add('pdf', '/pdf')->controller('Tests\\Functional\\Controller\\TestController::pdf');
+        $routes->add('binary', '/binary')->controller('Tests\\Functional\\Controller\\TestController::binary');
+        $routes->add('stream', '/stream')->controller('Tests\\Functional\\Controller\\TestController::stream');
+        $routes->add('bigjson', '/bigjson')->controller('Tests\\Functional\\Controller\\TestController::bigjson');
     }
 
     public function getProjectDir(): string
