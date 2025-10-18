@@ -14,9 +14,9 @@ Features
 
 ### Installation
 1) `composer req --dev savinmikhail/symfony-profiler-response-bundle`
-2) Register the bundle in your app (dev only recommended):
+2) Register the bundle in your app (though flex should do it for you):
 
-```
+```php
 // config/bundles.php
 return [
     // ...
@@ -26,7 +26,7 @@ return [
 
 3) Optional config (dev): `config/packages/dev/response_profiler.yaml`
 
-```
+```yaml
 response_profiler:
   enabled: true
   max_length: 262144           # bytes (256 KB)
