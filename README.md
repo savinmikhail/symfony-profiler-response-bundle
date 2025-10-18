@@ -41,6 +41,8 @@ Usage
 - In the Web Profiler, open any request and look for the new "Response Body" tab.
 - The toolbar badge shows MIME and size; the panel shows headers and the (pretty-printed) body, truncated if oversized.
 
+![img.png](img.png)
+
 Notes
 - This bundle is designed for development. Do not enable in production.
 - Streamed and binary responses are ignored.
