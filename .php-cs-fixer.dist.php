@@ -2,36 +2,29 @@
 
 declare(strict_types=1);
 
-$finder = PhpCsFixer\Finder::create()
+use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
+use PHPyh\CodingStandard\PhpCsFixerCodingStandard;
+
+$finder = Finder::create()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests')
     ->exclude('var')
     ->ignoreVCS(true)
 ;
 
-return (new PhpCsFixer\Config())
-    ->setRiskyAllowed(true)
-    ->setCacheFile(__DIR__ . '/.php-cs-fixer.cache')
-    ->setRules([
-        '@PSR12' => true,
-        '@Symfony' => true,
-        '@Symfony:risky' => true,
-        'array_syntax' => ['syntax' => 'short'],
-        'declare_strict_types' => true,
-        'no_unused_imports' => true,
-        'strict_param' => true,
-        'phpdoc_align' => ['align' => 'left'],
-        'phpdoc_to_comment' => false,
-        'native_function_invocation' => [
-            'scope' => 'namespaced',
-            'include' => ['@internal'],
-            'strict' => true,
-        ],
-        'ordered_imports' => [
-            'imports_order' => ['class', 'function', 'const'],
-            'sort_algorithm' => 'alpha',
-        ],
-    ])
-    ->setFinder($finder)
-;
+$config = (new Config())
+    ->setCacheFile(__DIR__ . '/var/.php-cs-fixer.cache')
+    ->setFinder($finder);
 
+(new PhpCsFixerCodingStandard())->applyTo($config, [
+    'global_namespace_import' => [
+        'import_constants' => true,
+        'import_functions' => true,
+        'import_classes' => true,
+    ],
+    'php_unit_test_case_static_method_calls' => ['call_type' => 'self'],
+    'blank_line_between_import_groups' => true,
+]);
+
+return $config;

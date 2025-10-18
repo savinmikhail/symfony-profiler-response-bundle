@@ -21,7 +21,7 @@ final class ResponseBodyCollectorTest extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->kernel instanceof \Tests\Functional\TestKernel) {
+        if ($this->kernel instanceof TestKernel) {
             $this->kernel->shutdown();
         }
         $this->kernel = null;
@@ -87,6 +87,6 @@ final class ResponseBodyCollectorTest extends TestCase
         self::assertTrue($collector->isCaptured());
         self::assertTrue($collector->isTruncated());
         self::assertGreaterThan($collector->getDisplaySize(), $collector->getSize());
-        self::assertSame(1024, $collector->getMaxLength());
+        self::assertSame(1_024, $collector->getMaxLength());
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4116ba6ca0bee6403537cfa07f2305a0",
+    "content-hash": "1cffc32e8dff5c69e0b1c0b443bc10a9",
     "packages": [
         {
             "name": "clue/ndjson-react",
@@ -2664,7 +2664,65 @@
             "time": "2025-09-11T14:36:48+00:00"
         }
     ],
-    "packages-dev": [],
+    "packages-dev": [
+        {
+            "name": "phpyh/coding-standard",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpyh/coding-standard.git",
+                "reference": "f9c3faf97a292a50b0ecf7df4c72dd5a237789c8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpyh/coding-standard/zipball/f9c3faf97a292a50b0ecf7df4c72dd5a237789c8",
+                "reference": "f9c3faf97a292a50b0ecf7df4c72dd5a237789c8",
+                "shasum": ""
+            },
+            "require": {
+                "friendsofphp/php-cs-fixer": "^3.84.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "bamarni/composer-bin-plugin": "^1.8.2"
+            },
+            "type": "library",
+            "extra": {
+                "bamarni-bin": {
+                    "bin-links": false,
+                    "forward-command": true,
+                    "target-directory": "tools"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPyh\\CodingStandard\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Valentin Udaltsov",
+                    "email": "udaltsov.valentin@gmail.com"
+                }
+            ],
+            "description": "PHPyh Coding Standard For PHP CS Fixer",
+            "keywords": [
+                "Static code analysis",
+                "fixer",
+                "standards",
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/phpyh/coding-standard/issues",
+                "source": "https://github.com/phpyh/coding-standard/tree/3.0.0"
+            },
+            "time": "2025-07-16T23:41:09+00:00"
+        }
+    ],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {},

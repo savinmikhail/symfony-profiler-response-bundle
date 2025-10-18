@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
+use function dirname;
+
 final class TestKernel extends Kernel
 {
     use MicroKernelTrait;
@@ -43,31 +45,31 @@ final class TestKernel extends Kernel
 
         $c->loadFromExtension(extension: 'response_profiler', values: [
             'enabled' => true,
-            'max_length' => 1024, // smaller for truncation tests
+            'max_length' => 1_024, // smaller for truncation tests
         ]);
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->add(name: 'json', path: '/json')->controller(controller: fn(): Response => new JsonResponse(data: ['hello' => 'world', 'answer' => 42]));
+        $routes->add(name: 'json', path: '/json')->controller(controller: static fn(): Response => new JsonResponse(data: ['hello' => 'world', 'answer' => 42]));
 
-        $routes->add(name: 'text', path: '/text')->controller(controller: fn(): Response => new Response(content: 'plain text body', headers: ['Content-Type' => 'text/plain']));
+        $routes->add(name: 'text', path: '/text')->controller(controller: static fn(): Response => new Response(content: 'plain text body', headers: ['Content-Type' => 'text/plain']));
 
-        $routes->add(name: 'pdf', path: '/pdf')->controller(controller: fn(): Response => new Response(content: '%PDF-1.4 binary data', headers: ['Content-Type' => 'application/pdf']));
+        $routes->add(name: 'pdf', path: '/pdf')->controller(controller: static fn(): Response => new Response(content: '%PDF-1.4 binary data', headers: ['Content-Type' => 'application/pdf']));
 
-        $routes->add(name: 'binary', path: '/binary')->controller(controller: function (): Response {
-            $file = \sys_get_temp_dir().'/rf_binary_test_'.\uniqid(more_entropy: true).'.bin';
-            \file_put_contents(filename: $file, data: \random_bytes(length: 16));
+        $routes->add(name: 'binary', path: '/binary')->controller(controller: static function (): Response {
+            $file = sys_get_temp_dir() . '/rf_binary_test_' . uniqid(more_entropy: true) . '.bin';
+            file_put_contents(filename: $file, data: random_bytes(length: 16));
 
             return new BinaryFileResponse(file: $file);
         });
 
-        $routes->add(name: 'stream', path: '/stream')->controller(controller: fn(): Response => new StreamedResponse(callbackOrChunks: static function (): void {
+        $routes->add(name: 'stream', path: '/stream')->controller(controller: static fn(): Response => new StreamedResponse(callbackOrChunks: static function (): void {
             echo 'streamed';
         }));
 
-        $routes->add(name: 'bigjson', path: '/bigjson')->controller(controller: function (): Response {
-            $payload = ['chunk' => \str_repeat(string: 'A', times: 3000)];
+        $routes->add(name: 'bigjson', path: '/bigjson')->controller(controller: static function (): Response {
+            $payload = ['chunk' => str_repeat(string: 'A', times: 3_000)];
 
             return new JsonResponse(data: $payload);
         });
@@ -75,16 +77,16 @@ final class TestKernel extends Kernel
 
     public function getProjectDir(): string
     {
-        return \dirname(path: __DIR__);
+        return dirname(path: __DIR__);
     }
 
     public function getCacheDir(): string
     {
-        return __DIR__.'/../var/cache/'.$this->environment;
+        return __DIR__ . '/../var/cache/' . $this->environment;
     }
 
     public function getLogDir(): string
     {
-        return __DIR__.'/../var/log';
+        return __DIR__ . '/../var/log';
     }
 }

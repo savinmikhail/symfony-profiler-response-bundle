@@ -20,7 +20,7 @@ final class ResponseProfilerExtension extends Extension
         $container->setParameter(name: 'response_profiler.max_length', value: (int) $config['max_length']);
         $container->setParameter(name: 'response_profiler.allowed_mime_types', value: (array) $config['allowed_mime_types']);
 
-        $loader = new YamlFileLoader(container: $container, locator: new FileLocator(paths: __DIR__.'/../Resources/config'));
+        $loader = new YamlFileLoader(container: $container, locator: new FileLocator(paths: __DIR__ . '/../Resources/config'));
         $loader->load(resource: 'services.yaml');
     }
 }

@@ -18,8 +18,8 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
                 ->integerNode('max_length')
-                    ->min(1024)
-                    ->defaultValue(262144) // 256 KB
+                    ->min(1_024)
+                    ->defaultValue(262_144) // 256 KB
                 ->end()
                 ->arrayNode('allowed_mime_types')
                     ->prototype('scalar')->end()
