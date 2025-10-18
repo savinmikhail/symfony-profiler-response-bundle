@@ -10,7 +10,7 @@ Features
 - Truncates large payloads (default 256 KB) to protect the toolbar
 - Pretty-prints JSON when possible
 
-Installation
+### Installation
 1) `composer req --dev savinmikhail/symfony-profiler-response-bundle`
 2) Register the bundle in your app (dev only recommended):
 
@@ -37,9 +37,11 @@ response_profiler:
     - text/json
 ```
 
-Usage
+### Usage
 - In the Web Profiler, open any request and look for the new "Response Body" tab.
 - The toolbar badge shows MIME and size; the panel shows headers and the (pretty-printed) body, truncated if oversized.
+
+Appearance
 
 ![img.png](img.png)
 
