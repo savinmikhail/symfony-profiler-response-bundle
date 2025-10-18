@@ -1,0 +1,11 @@
+parameters:
+  level: max
+  paths:
+    - src
+    - tests
+  checkGenericClassInNonGenericObjectType: false
+  checkMissingIterableValueType: true
+  checkUninitializedProperties: true
+  inferPrivatePropertyTypeFromConstructor: true
+  reportUnmatchedIgnoredErrors: true
+
