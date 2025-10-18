@@ -3,6 +3,17 @@
   "description": "Symfony Web Profiler panel to display JSON/text response bodies with size limits and guards (dev-only)",
   "type": "symfony-bundle",
   "license": "MIT",
+  "keywords": [
+    "profiling",
+    "debug",
+    "dev"
+  ],
+  "authors": [
+    {
+      "name": "Savin Mikhail",
+      "email": "mikhail.d.savin@gmail.com"
+    }
+  ],
   "require": {
     "php": ">=8.1",
     "symfony/http-kernel": "^5.4 || ^6.0 || ^7.0",
