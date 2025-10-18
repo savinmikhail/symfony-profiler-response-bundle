@@ -39,80 +39,47 @@ final class ResponseBodyCollector extends DataCollector
             return;
         }
 
-        if ($response instanceof StreamedResponse || $response instanceof BinaryFileResponse) {
-            $this->data['captured'] = false;
-            $this->data['reason'] = 'streamed_or_binary';
-            $this->data['contentType'] = $response->headers->get(key: 'Content-Type', default: '');
-
+        if ($this->isStreamedOrBinary(response: $response)) {
+            $this->markNotCaptured(reason: 'streamed_or_binary', contentTypeHeader: $this->getContentTypeHeader(response: $response));
             return;
         }
 
-        $contentTypeHeader = (string) $response->headers->get(key: 'Content-Type', default: '');
-        $mime = strtolower(string: trim(string: explode(separator: ';', string: $contentTypeHeader)[0] ?? ''));
+        $contentTypeHeader = $this->getContentTypeHeader(response: $response);
+        $mime = $this->extractMime(contentTypeHeader: $contentTypeHeader);
 
-        $isJson = $response instanceof JsonResponse || str_contains(haystack: $mime, needle: 'json');
-        $isTextual = $isJson || ($mime !== '' && (str_starts_with(haystack: $mime, needle: 'text/') || in_array(needle: $mime, haystack: $this->allowedMimeTypes, strict: true)));
+        [$isJson, $isTextual] = $this->determineNature(response: $response, mime: $mime);
 
         if (!$isTextual) {
-            $this->data['captured'] = false;
-            $this->data['reason'] = 'non_textual';
-            $this->data['contentType'] = $contentTypeHeader;
-
+            $this->markNotCaptured(reason: 'non_textual', contentTypeHeader: $contentTypeHeader);
             return;
         }
 
-        try {
-            $raw = (string) $response->getContent();
-        } catch (Throwable) {
-            $this->data['captured'] = false;
-            $this->data['reason'] = 'unavailable_content';
-            $this->data['contentType'] = $contentTypeHeader;
-
+        $raw = $this->getContentSafely(response: $response);
+        if ($raw === null) {
+            $this->markNotCaptured(reason: 'unavailable_content', contentTypeHeader: $contentTypeHeader);
             return;
         }
 
         $originalSize = strlen(string: $raw);
 
-        $rawDisplay = $raw;
-        $prettyDisplay = null;
-        if ($isJson) {
-            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $pretty = json_encode($decoded, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                $prettyDisplay = $pretty;
-            }
-        }
+        [$rawDisplay, $prettyDisplay] = $this->prepareDisplays(raw: $raw, isJson: $isJson);
 
-        $rawTruncated = false;
-        $prettyTruncated = false;
-        if ($this->maxLength > 0) {
-            if (strlen(string: $rawDisplay) > $this->maxLength) {
-                $rawDisplay = substr(string: $rawDisplay, offset: 0, length: $this->maxLength);
-                $rawTruncated = true;
-            }
-            if (is_string(value: $prettyDisplay) && strlen(string: $prettyDisplay) > $this->maxLength) {
-                $prettyDisplay = substr(string: $prettyDisplay, offset: 0, length: $this->maxLength);
-                $prettyTruncated = true;
-            }
-        }
+        [$rawDisplay, $prettyDisplay, $rawTruncated, $prettyTruncated] = $this->applyTruncation(
+            rawDisplay: $rawDisplay,
+            prettyDisplay: $prettyDisplay,
+            limit: $this->maxLength
+        );
 
-        $display = $prettyDisplay ?? $rawDisplay;
-
-        $this->data = [
-            'captured' => true,
-            'content' => $display,
-            'raw' => $rawDisplay,
-            'pretty' => $prettyDisplay,
-            'truncated' => $rawTruncated || $prettyTruncated,
-            'truncatedRaw' => $rawTruncated,
-            'truncatedPretty' => $prettyTruncated,
-            'size' => $originalSize,
-            'displaySize' => strlen(string: $display),
-            'maxLength' => $this->maxLength,
-            'contentType' => $contentTypeHeader,
-            'mime' => $mime,
-            'json' => $isJson,
-        ];
+        $this->setCapturedData(
+            contentTypeHeader: $contentTypeHeader,
+            mime: $mime,
+            isJson: $isJson,
+            originalSize: $originalSize,
+            rawDisplay: $rawDisplay,
+            prettyDisplay: $prettyDisplay,
+            rawTruncated: $rawTruncated,
+            prettyTruncated: $prettyTruncated
+        );
     }
 
     public function getName(): string
@@ -213,5 +180,119 @@ final class ResponseBodyCollector extends DataCollector
     public function isJson(): bool
     {
         return (bool) ($this->data['json'] ?? false);
+    }
+
+    private function isStreamedOrBinary(Response $response): bool
+    {
+        return $response instanceof StreamedResponse || $response instanceof BinaryFileResponse;
+    }
+
+    private function getContentTypeHeader(Response $response): string
+    {
+        return (string) $response->headers->get(key: 'Content-Type', default: '');
+    }
+
+    private function extractMime(string $contentTypeHeader): string
+    {
+        return strtolower(string: trim(string: explode(separator: ';', string: $contentTypeHeader)[0] ?? ''));
+    }
+
+    /**
+     * @return array{0: bool, 1: bool} [isJson, isTextual]
+     */
+    private function determineNature(Response $response, string $mime): array
+    {
+        $isJson = $response instanceof JsonResponse || str_contains(haystack: $mime, needle: 'json');
+        $isTextual = $isJson || ($mime !== '' && (str_starts_with(haystack: $mime, needle: 'text/') || in_array(needle: $mime, haystack: $this->allowedMimeTypes, strict: true)));
+
+        return [$isJson, $isTextual];
+    }
+
+    private function getContentSafely(Response $response): ?string
+    {
+        try {
+            return (string) $response->getContent();
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @return array{0: string, 1: ?string}
+     * @throws JsonException
+     */
+    private function prepareDisplays(string $raw, bool $isJson): array
+    {
+        $rawDisplay = $raw;
+        $prettyDisplay = null;
+
+        if ($isJson) {
+            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $pretty = json_encode($decoded, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                $prettyDisplay = $pretty;
+            }
+        }
+
+        return [$rawDisplay, $prettyDisplay];
+    }
+
+    /**
+     * @return array{0: string, 1: ?string, 2: bool, 3: bool}
+     */
+    private function applyTruncation(string $rawDisplay, ?string $prettyDisplay, int $limit): array
+    {
+        $rawTruncated = false;
+        $prettyTruncated = false;
+
+        if ($limit > 0) {
+            if (strlen(string: $rawDisplay) > $limit) {
+                $rawDisplay = substr(string: $rawDisplay, offset: 0, length: $limit);
+                $rawTruncated = true;
+            }
+
+            if (is_string(value: $prettyDisplay) && strlen(string: $prettyDisplay) > $limit) {
+                $prettyDisplay = substr(string: $prettyDisplay, offset: 0, length: $limit);
+                $prettyTruncated = true;
+            }
+        }
+
+        return [$rawDisplay, $prettyDisplay, $rawTruncated, $prettyTruncated];
+    }
+
+    private function setCapturedData(
+        string $contentTypeHeader,
+        string $mime,
+        bool $isJson,
+        int $originalSize,
+        string $rawDisplay,
+        ?string $prettyDisplay,
+        bool $rawTruncated,
+        bool $prettyTruncated
+    ): void {
+        $display = $prettyDisplay ?? $rawDisplay;
+
+        $this->data = [
+            'captured' => true,
+            'content' => $display,
+            'raw' => $rawDisplay,
+            'pretty' => $prettyDisplay,
+            'truncated' => $rawTruncated || $prettyTruncated,
+            'truncatedRaw' => $rawTruncated,
+            'truncatedPretty' => $prettyTruncated,
+            'size' => $originalSize,
+            'displaySize' => strlen(string: $display),
+            'maxLength' => $this->maxLength,
+            'contentType' => $contentTypeHeader,
+            'mime' => $mime,
+            'json' => $isJson,
+        ];
+    }
+
+    private function markNotCaptured(string $reason, string $contentTypeHeader): void
+    {
+        $this->data['captured'] = false;
+        $this->data['reason'] = $reason;
+        $this->data['contentType'] = $contentTypeHeader;
     }
 }
