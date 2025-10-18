@@ -9,7 +9,8 @@ Features
 - Pretty-prints JSON when possible
 
 Installation
-1) Register the bundle in your app (dev only recommended):
+1) `composer req --dev savinmikhail/symfony-profiler-response-bundle`
+2) Register the bundle in your app (dev only recommended):
 
 ```
 // config/bundles.php
@@ -19,7 +20,7 @@ return [
 ];
 ```
 
-2) Optional config (dev): `config/packages/dev/response_profiler.yaml`
+3) Optional config (dev): `config/packages/dev/response_profiler.yaml`
 
 ```
 response_profiler:
