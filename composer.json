@@ -1,8 +1,8 @@
 {
   "name": "savinmikhail/symfony-profiler-response-bundle",
   "description": "Symfony Web Profiler panel to display JSON/text response bodies with size limits and guards (dev-only)",
-  "type": "symfony-bundle",
   "license": "MIT",
+  "type": "symfony-bundle",
   "keywords": [
     "profiling",
     "debug",
@@ -16,18 +16,20 @@
   ],
   "require": {
     "php": ">=8.1",
-    "symfony/http-kernel": "^5.4 || ^6.0 || ^7.0",
-    "symfony/http-foundation": "^5.4 || ^6.0 || ^7.0",
-    "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0",
     "symfony/config": "^5.4 || ^6.0 || ^7.0",
+    "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0",
+    "symfony/http-foundation": "^5.4 || ^6.0 || ^7.0",
+    "symfony/http-kernel": "^5.4 || ^6.0 || ^7.0",
     "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
   },
   "require-dev": {
+    "bamarni/composer-bin-plugin": "^1.8",
+    "ergebnis/composer-normalize": "^2.48",
     "symfony/framework-bundle": "^5.4 || ^6.0 || ^7.0",
     "symfony/routing": "^5.4 || ^6.0 || ^7.0",
-    "symfony/web-profiler-bundle": "^5.4 || ^6.0 || ^7.0",
-    "bamarni/composer-bin-plugin": "^1.8"
+    "symfony/web-profiler-bundle": "^5.4 || ^6.0 || ^7.0"
   },
+  "prefer-stable": true,
   "autoload": {
     "psr-4": {
       "SavinMikhail\\ResponseProfilerBundle\\": "src/"
@@ -38,6 +40,13 @@
       "Tests\\": "tests/"
     }
   },
+  "config": {
+    "allow-plugins": {
+      "bamarni/composer-bin-plugin": true,
+      "ergebnis/composer-normalize": true
+    },
+    "sort-packages": true
+  },
   "extra": {
     "bamarni-bin": {
       "bin-links": true,
@@ -46,15 +55,10 @@
     },
     "symfony": {
       "bundle": {
-        "SavinMikhail\\ResponseProfilerBundle\\ResponseProfilerBundle": ["all"]
+        "SavinMikhail\\ResponseProfilerBundle\\ResponseProfilerBundle": [
+          "all"
+        ]
       }
     }
-  },
-  "config": {
-    "sort-packages": true,
-    "allow-plugins": {
-      "bamarni/composer-bin-plugin": true
-    }
-  },
-  "prefer-stable": true
+  }
 }
