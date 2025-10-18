@@ -1,0 +1,14 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: false
+    public: false
+
+  SavinMikhail\ResponseProfilerBundle\Collector\ResponseBodyCollector:
+    arguments:
+      $enabled: '%response_profiler.enabled%'
+      $maxLength: '%response_profiler.max_length%'
+      $allowedMimeTypes: '%response_profiler.allowed_mime_types%'
+    tags:
+      - { name: data_collector, template: '@ResponseProfiler/Collector/response_body.html.twig', id: 'response_body' }
+

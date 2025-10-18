@@ -1,0 +1,73 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <span class="sf-toolbar-label">Resp</span>
+        <span class="sf-toolbar-value">{{ collector.mime ?: 'n/a' }}</span>
+        {% if collector.captured %}
+            <span class="sf-toolbar-info-piece-additional">{{ (collector.size / 1024)|number_format(1) }} KB</span>
+        {% endif %}
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Content-Type</b>
+            <span>{{ collector.contentType ?: 'unknown' }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Size</b>
+            <span>{{ collector.size }} B{% if collector.truncated %} (truncated){% endif %}</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: collector.captured ? profiler_url : false }) }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.captured ? '' : 'disabled' }}">
+        <span class="icon"></span>
+        <strong>Response Body</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Response Body</h2>
+
+    {% if not collector.captured %}
+        <div class="empty">
+            <p>No capturable response body ({{ collector.reason ?: 'unknown reason' }}).</p>
+            {% if collector.contentType %}
+                <p>Content-Type: <code>{{ collector.contentType }}</code></p>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">{{ collector.mime ?: 'n/a' }}</span>
+                <span class="label">MIME</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.size }} <span class="unit">B</span></span>
+                <span class="label">Original size</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.displaySize }} <span class="unit">B</span></span>
+                <span class="label">Displayed</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.maxLength }} <span class="unit">B</span></span>
+                <span class="label">Max length</span>
+            </div>
+        </div>
+
+        {% if collector.truncated %}
+            <div class="sf-alert sf-alert-warning">
+                The displayed content was truncated at {{ collector.maxLength }} bytes.
+            </div>
+        {% endif %}
+
+        <h3>Body</h3>
+        <pre class="sf-dump sf-reset">{{ collector.content }}</pre>
+    {% endif %}
+{% endblock %}
+
