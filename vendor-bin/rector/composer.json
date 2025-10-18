@@ -1,0 +1,7 @@
+{
+  "require": {
+    "rector/rector": "^2.0",
+    "phpstan/phpstan": "^2.1",
+    "savinmikhail/add_named_arguments_rector": "^0.1.0"
+  }
+}
