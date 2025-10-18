@@ -1,3 +1,5 @@
+![dist-size status](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsavinmikhail%2Fdist-size-optimizer%2Fmain%2Fdist-size-status.json)
+
 ## Symfony Profiler Response Bundle
 
 Dev-only Symfony bundle that adds a "Response Body" panel to the Web Profiler, showing JSON/text response payloads with size limits and sensible guards.
