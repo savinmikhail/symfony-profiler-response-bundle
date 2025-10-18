@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SavinMikhail\ResponseProfilerBundle\Collector;
 
+use JsonException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,13 +20,19 @@ use function strlen;
 final class ResponseBodyCollector extends DataCollector
 {
     /**
-     * @param list<string> $allowedMimeTypes
+     * @param string[] $allowedMimeTypes
      */
-    public function __construct(private readonly bool $enabled, private readonly int $maxLength = 262_144, private readonly array $allowedMimeTypes = [])
-    {
+    public function __construct(
+        private readonly bool $enabled, 
+        private readonly int $maxLength = 262_144, 
+        private readonly array $allowedMimeTypes = []
+    ) {
         $this->reset();
     }
 
+    /**
+     * @throws JsonException
+     */
     public function collect(Request $request, Response $response, ?Throwable $exception = null): void
     {
         if (!$this->enabled) {
@@ -69,12 +76,10 @@ final class ResponseBodyCollector extends DataCollector
         $rawDisplay = $raw;
         $prettyDisplay = null;
         if ($isJson) {
-            $decoded = json_decode(json: $raw, associative: true);
+            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
             if (json_last_error() === JSON_ERROR_NONE) {
-                $pretty = json_encode(value: $decoded, flags: JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                if (is_string(value: $pretty)) {
-                    $prettyDisplay = $pretty;
-                }
+                $pretty = json_encode($decoded, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                $prettyDisplay = $pretty;
             }
         }
 
@@ -128,7 +133,7 @@ final class ResponseBodyCollector extends DataCollector
             'truncatedPretty' => false,
             'size' => 0,
             'displaySize' => 0,
-            'maxLength' => $this->maxLength ?? 262_144,
+            'maxLength' => $this->maxLength,
             'contentType' => '',
             'mime' => '',
             'json' => false,
