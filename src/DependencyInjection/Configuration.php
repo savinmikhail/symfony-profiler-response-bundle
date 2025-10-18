@@ -11,7 +11,7 @@ final class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('response_profiler');
+        $treeBuilder = new TreeBuilder(name: 'response_profiler');
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode

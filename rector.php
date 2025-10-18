@@ -19,5 +19,8 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::TYPE_DECLARATION,
         SetList::EARLY_RETURN,
     ]);
+    $rectorConfig->rules([
+        SavinMikhail\AddNamedArgumentsRector\AddNamedArgumentsRector::class,
+    ]);
 };
 

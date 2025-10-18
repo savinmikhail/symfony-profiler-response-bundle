@@ -30,16 +30,16 @@ final class ResponseBodyCollector extends DataCollector
         if ($response instanceof StreamedResponse || $response instanceof BinaryFileResponse) {
             $this->data['captured'] = false;
             $this->data['reason'] = 'streamed_or_binary';
-            $this->data['contentType'] = $response->headers->get('Content-Type', '');
+            $this->data['contentType'] = $response->headers->get(key: 'Content-Type', default: '');
 
             return;
         }
 
-        $contentTypeHeader = (string) $response->headers->get('Content-Type', '');
-        $mime = \strtolower(\trim(\explode(';', $contentTypeHeader)[0] ?? ''));
+        $contentTypeHeader = (string) $response->headers->get(key: 'Content-Type', default: '');
+        $mime = \strtolower(string: \trim(string: \explode(separator: ';', string: $contentTypeHeader)[0] ?? ''));
 
-        $isJson = $response instanceof JsonResponse || \str_contains($mime, 'json');
-        $isTextual = $isJson || ('' !== $mime && (\str_starts_with($mime, 'text/') || \in_array($mime, $this->allowedMimeTypes, true)));
+        $isJson = $response instanceof JsonResponse || \str_contains(haystack: $mime, needle: 'json');
+        $isTextual = $isJson || ('' !== $mime && (\str_starts_with(haystack: $mime, needle: 'text/') || \in_array(needle: $mime, haystack: $this->allowedMimeTypes, strict: true)));
 
         if (!$isTextual) {
             $this->data['captured'] = false;
@@ -59,22 +59,22 @@ final class ResponseBodyCollector extends DataCollector
             return;
         }
 
-        $originalSize = \strlen($raw);
+        $originalSize = \strlen(string: $raw);
 
         $display = $raw;
         if ($isJson) {
-            $decoded = \json_decode($raw, true);
+            $decoded = \json_decode(json: $raw, associative: true);
             if (\JSON_ERROR_NONE === \json_last_error()) {
-                $pretty = \json_encode($decoded, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
-                if (\is_string($pretty)) {
+                $pretty = \json_encode(value: $decoded, flags: \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+                if (\is_string(value: $pretty)) {
                     $display = $pretty;
                 }
             }
         }
 
         $truncated = false;
-        if ($this->maxLength > 0 && \strlen($display) > $this->maxLength) {
-            $display = \substr($display, 0, $this->maxLength);
+        if ($this->maxLength > 0 && \strlen(string: $display) > $this->maxLength) {
+            $display = \substr(string: $display, offset: 0, length: $this->maxLength);
             $truncated = true;
         }
 
@@ -83,7 +83,7 @@ final class ResponseBodyCollector extends DataCollector
             'content' => $display,
             'truncated' => $truncated,
             'size' => $originalSize,
-            'displaySize' => \strlen($display),
+            'displaySize' => \strlen(string: $display),
             'maxLength' => $this->maxLength,
             'contentType' => $contentTypeHeader,
             'mime' => $mime,

@@ -28,7 +28,7 @@ final class TestKernel extends Kernel
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
-        $c->loadFromExtension('framework', [
+        $c->loadFromExtension(extension: 'framework', values: [
             'secret' => 'test_secret',
             'http_method_override' => false,
             'test' => true,
@@ -41,7 +41,7 @@ final class TestKernel extends Kernel
             ],
         ]);
 
-        $c->loadFromExtension('response_profiler', [
+        $c->loadFromExtension(extension: 'response_profiler', values: [
             'enabled' => true,
             'max_length' => 1024, // smaller for truncation tests
         ]);
@@ -49,33 +49,33 @@ final class TestKernel extends Kernel
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->add('json', '/json')->controller(fn(): Response => new JsonResponse(['hello' => 'world', 'answer' => 42]));
+        $routes->add(name: 'json', path: '/json')->controller(controller: fn(): Response => new JsonResponse(data: ['hello' => 'world', 'answer' => 42]));
 
-        $routes->add('text', '/text')->controller(fn(): Response => new Response('plain text body', 200, ['Content-Type' => 'text/plain']));
+        $routes->add(name: 'text', path: '/text')->controller(controller: fn(): Response => new Response(content: 'plain text body', headers: ['Content-Type' => 'text/plain']));
 
-        $routes->add('pdf', '/pdf')->controller(fn(): Response => new Response('%PDF-1.4 binary data', 200, ['Content-Type' => 'application/pdf']));
+        $routes->add(name: 'pdf', path: '/pdf')->controller(controller: fn(): Response => new Response(content: '%PDF-1.4 binary data', headers: ['Content-Type' => 'application/pdf']));
 
-        $routes->add('binary', '/binary')->controller(function (): Response {
-            $file = \sys_get_temp_dir().'/rf_binary_test_'.\uniqid('', true).'.bin';
-            \file_put_contents($file, \random_bytes(16));
+        $routes->add(name: 'binary', path: '/binary')->controller(controller: function (): Response {
+            $file = \sys_get_temp_dir().'/rf_binary_test_'.\uniqid(more_entropy: true).'.bin';
+            \file_put_contents(filename: $file, data: \random_bytes(length: 16));
 
-            return new BinaryFileResponse($file);
+            return new BinaryFileResponse(file: $file);
         });
 
-        $routes->add('stream', '/stream')->controller(fn(): Response => new StreamedResponse(static function (): void {
+        $routes->add(name: 'stream', path: '/stream')->controller(controller: fn(): Response => new StreamedResponse(callbackOrChunks: static function (): void {
             echo 'streamed';
         }));
 
-        $routes->add('bigjson', '/bigjson')->controller(function (): Response {
-            $payload = ['chunk' => \str_repeat('A', 3000)];
+        $routes->add(name: 'bigjson', path: '/bigjson')->controller(controller: function (): Response {
+            $payload = ['chunk' => \str_repeat(string: 'A', times: 3000)];
 
-            return new JsonResponse($payload);
+            return new JsonResponse(data: $payload);
         });
     }
 
     public function getProjectDir(): string
     {
-        return \dirname(__DIR__, 1);
+        return \dirname(path: __DIR__);
     }
 
     public function getCacheDir(): string

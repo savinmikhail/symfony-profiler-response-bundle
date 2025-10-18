@@ -14,13 +14,13 @@ final class ResponseProfilerExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(configuration: $configuration, configs: $configs);
 
-        $container->setParameter('response_profiler.enabled', (bool) $config['enabled']);
-        $container->setParameter('response_profiler.max_length', (int) $config['max_length']);
-        $container->setParameter('response_profiler.allowed_mime_types', (array) $config['allowed_mime_types']);
+        $container->setParameter(name: 'response_profiler.enabled', value: (bool) $config['enabled']);
+        $container->setParameter(name: 'response_profiler.max_length', value: (int) $config['max_length']);
+        $container->setParameter(name: 'response_profiler.allowed_mime_types', value: (array) $config['allowed_mime_types']);
 
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yaml');
+        $loader = new YamlFileLoader(container: $container, locator: new FileLocator(paths: __DIR__.'/../Resources/config'));
+        $loader->load(resource: 'services.yaml');
     }
 }
