@@ -2,10 +2,10 @@
 
 {% block toolbar %}
     {% set icon %}
-        <span class="sf-toolbar-label">Resp</span>
-        <span class="sf-toolbar-value">{{ collector.mime ?: 'n/a' }}</span>
+        {{ include('@ResponseProfiler/Icon/response-body.svg') }}
+        <span class="sf-toolbar-value">{{ collector.json ? 'JSON' : (collector.mime ?: 'n/a') }}</span>
         {% if collector.captured %}
-            <span class="sf-toolbar-info-piece-additional">{{ (collector.size / 1024)|number_format(1) }} KB</span>
+            <span class="sf-toolbar-label">{{ (collector.size / 1024)|number_format(1) }} KB</span>
         {% endif %}
     {% endset %}
 
@@ -25,12 +25,19 @@
 
 {% block menu %}
     <span class="label {{ collector.captured ? '' : 'disabled' }}">
-        <span class="icon"></span>
+        <span class="icon">{{ include('@ResponseProfiler/Icon/response-body.svg') }}</span>
         <strong>Response Body</strong>
     </span>
 {% endblock %}
 
 {% block panel %}
+    <style>
+        .rfp-body-actions { display:flex; gap:.5rem; align-items:center; margin: .5rem 0 1rem; }
+        .rfp-badge { background: var(--highlight-color, #2ea44f); color:#fff; border-radius: 3px; padding: 2px 6px; font-size: 12px; }
+        .rfp-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        .rfp-pre { white-space: pre-wrap; word-break: break-word; }
+    </style>
+
     <h2>Response Body</h2>
 
     {% if not collector.captured %}
@@ -60,14 +67,16 @@
             </div>
         </div>
 
-        {% if collector.truncated %}
-            <div class="sf-alert sf-alert-warning">
-                The displayed content was truncated at {{ collector.maxLength }} bytes.
-            </div>
-        {% endif %}
+        <div class="rfp-body-actions">
+            {% if collector.json %}<span class="rfp-badge">JSON</span>{% endif %}
+            <a class="btn btn-sm" href="data:text/plain;charset=utf-8,{{ collector.content|url_encode }}" download="response{{ collector.json ? '.json' : '.txt' }}">Download</a>
+            <button class="btn btn-sm" type="button" onclick="navigator.clipboard.writeText(document.getElementById('rfp-body').innerText)">Copy</button>
+            {% if collector.truncated %}
+                <span class="label">Truncated at {{ collector.maxLength }} bytes</span>
+            {% endif %}
+        </div>
 
         <h3>Body</h3>
-        <pre class="sf-dump sf-reset">{{ collector.content }}</pre>
+        <pre id="rfp-body" class="sf-dump sf-reset rfp-mono rfp-pre">{{ collector.content }}</pre>
     {% endif %}
 {% endblock %}
-
