@@ -36,6 +36,8 @@
         .rfp-badge { background: var(--highlight-color, #2ea44f); color:#fff; border-radius: 3px; padding: 2px 6px; font-size: 12px; }
         .rfp-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
         .rfp-pre { white-space: pre-wrap; word-break: break-word; }
+        .rfp-code { border: 1px solid var(--border-color, #3c3f44); border-radius: 6px; padding: 10px 12px; background: var(--code-bg, rgba(0,0,0,.2)); }
+        .btn.selected { background: var(--highlight-color, #2ea44f); color: #fff; }
     </style>
 
     <h2>Response Body</h2>
@@ -69,14 +71,73 @@
 
         <div class="rfp-body-actions">
             {% if collector.json %}<span class="rfp-badge">JSON</span>{% endif %}
-            <a class="btn btn-sm" href="data:text/plain;charset=utf-8,{{ collector.content|url_encode }}" download="response{{ collector.json ? '.json' : '.txt' }}">Download</a>
-            <button class="btn btn-sm" type="button" onclick="navigator.clipboard.writeText(document.getElementById('rfp-body').innerText)">Copy</button>
+            {% if collector.hasPretty() %}
+                <button id="rfp-btn-pretty" class="btn btn-sm selected" type="button">Pretty</button>
+                <button id="rfp-btn-raw" class="btn btn-sm" type="button">Raw</button>
+            {% else %}
+                <span class="label">Raw</span>
+            {% endif %}
+            <button id="rfp-copy" class="btn btn-sm" type="button">Copy</button>
+            <button id="rfp-download" class="btn btn-sm" type="button">Download</button>
             {% if collector.truncated %}
                 <span class="label">Truncated at {{ collector.maxLength }} bytes</span>
             {% endif %}
         </div>
 
-        <h3>Body</h3>
-        <pre id="rfp-body" class="sf-dump sf-reset rfp-mono rfp-pre">{{ collector.content }}</pre>
+        <div class="rfp-code">
+            {% if collector.hasPretty() %}
+                <pre id="rfp-body-pretty" class="sf-dump sf-reset rfp-mono rfp-pre">{{ collector.pretty }}</pre>
+            {% endif %}
+            <pre id="rfp-body-raw" class="sf-dump sf-reset rfp-mono rfp-pre" style="display: {{ collector.hasPretty() ? 'none' : 'block' }};">{{ collector.hasPretty() ? collector.raw : collector.content }}</pre>
+        </div>
+
+        <script>
+            (function () {
+                const hasPretty = {{ collector.hasPretty() ? 'true' : 'false' }};
+                const prettyBtn = document.getElementById('rfp-btn-pretty');
+                const rawBtn = document.getElementById('rfp-btn-raw');
+                const copyBtn = document.getElementById('rfp-copy');
+                const dlBtn = document.getElementById('rfp-download');
+                const pretty = document.getElementById('rfp-body-pretty');
+                const raw = document.getElementById('rfp-body-raw');
+
+                function activePre() { return hasPretty && pretty && pretty.style.display !== 'none' ? pretty : raw; }
+
+                function show(which) {
+                    if (!hasPretty) return;
+                    if (which === 'pretty') {
+                        if (pretty) pretty.style.display = 'block';
+                        if (raw) raw.style.display = 'none';
+                        if (prettyBtn) prettyBtn.classList.add('selected');
+                        if (rawBtn) rawBtn.classList.remove('selected');
+                    } else {
+                        if (pretty) pretty.style.display = 'none';
+                        if (raw) raw.style.display = 'block';
+                        if (prettyBtn) prettyBtn.classList.remove('selected');
+                        if (rawBtn) rawBtn.classList.add('selected');
+                    }
+                }
+
+                if (prettyBtn) prettyBtn.addEventListener('click', function () { show('pretty'); });
+                if (rawBtn) rawBtn.addEventListener('click', function () { show('raw'); });
+
+                copyBtn && copyBtn.addEventListener('click', function () {
+                    const el = activePre();
+                    if (el) navigator.clipboard.writeText(el.innerText);
+                });
+
+                dlBtn && dlBtn.addEventListener('click', function () {
+                    const el = activePre();
+                    if (!el) return;
+                    const text = el.innerText;
+                    const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = hasPretty && pretty && pretty.style.display !== 'none' ? 'response.json' : 'response.txt';
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+                });
+            })();
+        </script>
     {% endif %}
 {% endblock %}

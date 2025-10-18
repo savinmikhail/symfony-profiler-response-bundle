@@ -66,27 +66,41 @@ final class ResponseBodyCollector extends DataCollector
 
         $originalSize = strlen(string: $raw);
 
-        $display = $raw;
+        $rawDisplay = $raw;
+        $prettyDisplay = null;
         if ($isJson) {
             $decoded = json_decode(json: $raw, associative: true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $pretty = json_encode(value: $decoded, flags: JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 if (is_string(value: $pretty)) {
-                    $display = $pretty;
+                    $prettyDisplay = $pretty;
                 }
             }
         }
 
-        $truncated = false;
-        if ($this->maxLength > 0 && strlen(string: $display) > $this->maxLength) {
-            $display = substr(string: $display, offset: 0, length: $this->maxLength);
-            $truncated = true;
+        $rawTruncated = false;
+        $prettyTruncated = false;
+        if ($this->maxLength > 0) {
+            if (strlen(string: $rawDisplay) > $this->maxLength) {
+                $rawDisplay = substr(string: $rawDisplay, offset: 0, length: $this->maxLength);
+                $rawTruncated = true;
+            }
+            if (is_string(value: $prettyDisplay) && strlen(string: $prettyDisplay) > $this->maxLength) {
+                $prettyDisplay = substr(string: $prettyDisplay, offset: 0, length: $this->maxLength);
+                $prettyTruncated = true;
+            }
         }
+
+        $display = $prettyDisplay ?? $rawDisplay;
 
         $this->data = [
             'captured' => true,
             'content' => $display,
-            'truncated' => $truncated,
+            'raw' => $rawDisplay,
+            'pretty' => $prettyDisplay,
+            'truncated' => $rawTruncated || $prettyTruncated,
+            'truncatedRaw' => $rawTruncated,
+            'truncatedPretty' => $prettyTruncated,
             'size' => $originalSize,
             'displaySize' => strlen(string: $display),
             'maxLength' => $this->maxLength,
@@ -107,7 +121,11 @@ final class ResponseBodyCollector extends DataCollector
             'captured' => false,
             'reason' => null,
             'content' => '',
+            'raw' => '',
+            'pretty' => null,
             'truncated' => false,
+            'truncatedRaw' => false,
+            'truncatedPretty' => false,
             'size' => 0,
             'displaySize' => 0,
             'maxLength' => $this->maxLength ?? 262_144,
@@ -132,9 +150,34 @@ final class ResponseBodyCollector extends DataCollector
         return (string) ($this->data['content'] ?? '');
     }
 
+    public function getRaw(): string
+    {
+        return (string) ($this->data['raw'] ?? '');
+    }
+
+    public function getPretty(): ?string
+    {
+        return isset($this->data['pretty']) && is_string(value: $this->data['pretty']) ? $this->data['pretty'] : null;
+    }
+
+    public function hasPretty(): bool
+    {
+        return is_string(value: $this->getPretty());
+    }
+
     public function isTruncated(): bool
     {
         return (bool) ($this->data['truncated'] ?? false);
+    }
+
+    public function isTruncatedRaw(): bool
+    {
+        return (bool) ($this->data['truncatedRaw'] ?? false);
+    }
+
+    public function isTruncatedPretty(): bool
+    {
+        return (bool) ($this->data['truncatedPretty'] ?? false);
     }
 
     public function getSize(): int
