@@ -6,6 +6,7 @@ namespace Tests\Functional;
 
 use SavinMikhail\ResponseProfilerBundle\ResponseProfilerBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -14,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 
 final class TestKernel extends Kernel
 {
@@ -49,49 +49,42 @@ final class TestKernel extends Kernel
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->add('json', '/json')->controller(function (): Response {
-            return new JsonResponse(['hello' => 'world', 'answer' => 42]);
-        });
+        $routes->add('json', '/json')->controller(fn(): Response => new JsonResponse(['hello' => 'world', 'answer' => 42]));
 
-        $routes->add('text', '/text')->controller(function (): Response {
-            return new Response('plain text body', 200, ['Content-Type' => 'text/plain']);
-        });
+        $routes->add('text', '/text')->controller(fn(): Response => new Response('plain text body', 200, ['Content-Type' => 'text/plain']));
 
-        $routes->add('pdf', '/pdf')->controller(function (): Response {
-            return new Response('%PDF-1.4 binary data', 200, ['Content-Type' => 'application/pdf']);
-        });
+        $routes->add('pdf', '/pdf')->controller(fn(): Response => new Response('%PDF-1.4 binary data', 200, ['Content-Type' => 'application/pdf']));
 
         $routes->add('binary', '/binary')->controller(function (): Response {
-            $file = sys_get_temp_dir() . '/rf_binary_test_' . uniqid('', true) . '.bin';
-            file_put_contents($file, random_bytes(16));
+            $file = \sys_get_temp_dir().'/rf_binary_test_'.\uniqid('', true).'.bin';
+            \file_put_contents($file, \random_bytes(16));
+
             return new BinaryFileResponse($file);
         });
 
-        $routes->add('stream', '/stream')->controller(function (): Response {
-            return new StreamedResponse(static function (): void {
-                echo 'streamed';
-            });
-        });
+        $routes->add('stream', '/stream')->controller(fn(): Response => new StreamedResponse(static function (): void {
+            echo 'streamed';
+        }));
 
         $routes->add('bigjson', '/bigjson')->controller(function (): Response {
-            $payload = ['chunk' => str_repeat('A', 3000)];
+            $payload = ['chunk' => \str_repeat('A', 3000)];
+
             return new JsonResponse($payload);
         });
     }
 
     public function getProjectDir(): string
     {
-        return dirname(__DIR__, 1);
+        return \dirname(__DIR__, 1);
     }
 
     public function getCacheDir(): string
     {
-        return __DIR__ . '/../var/cache/' . $this->environment;
+        return __DIR__.'/../var/cache/'.$this->environment;
     }
 
     public function getLogDir(): string
     {
-        return __DIR__ . '/../var/log';
+        return __DIR__.'/../var/log';
     }
 }
-

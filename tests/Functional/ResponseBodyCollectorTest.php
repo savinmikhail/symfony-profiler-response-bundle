@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Functional;
 
 use PHPUnit\Framework\TestCase;
+use SavinMikhail\ResponseProfilerBundle\Collector\ResponseBodyCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use SavinMikhail\ResponseProfilerBundle\Collector\ResponseBodyCollector;
 
 final class ResponseBodyCollectorTest extends TestCase
 {
@@ -21,7 +21,7 @@ final class ResponseBodyCollectorTest extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->kernel) {
+        if ($this->kernel instanceof \Tests\Functional\TestKernel) {
             $this->kernel->shutdown();
         }
         $this->kernel = null;
@@ -39,6 +39,7 @@ final class ResponseBodyCollectorTest extends TestCase
         self::assertNotNull($profile, 'Profile should be available');
         /** @var ResponseBodyCollector $collector */
         $collector = $profile->getCollector('response_body');
+
         return $collector;
     }
 
@@ -89,4 +90,3 @@ final class ResponseBodyCollectorTest extends TestCase
         self::assertSame(1024, $collector->getMaxLength());
     }
 }
-
