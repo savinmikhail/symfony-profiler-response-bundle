@@ -56,8 +56,11 @@
     "symfony": {
       "bundle": {
         "SavinMikhail\\ResponseProfilerBundle\\ResponseProfilerBundle": [
-          "all"
+          "dev"
         ]
+      },
+      "copy-from-package": {
+        "config/packages/response_profiler.yaml": "%CONFIG_DIR%/packages/response_profiler.yaml"
       }
     }
   }

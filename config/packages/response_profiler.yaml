@@ -1,0 +1,12 @@
+when@dev:
+    response_profiler:
+        enabled: true
+        max_length: 262144           # bytes (256 KB)
+        allowed_mime_types:
+            - application/json
+            - application/ld+json
+            - application/problem+json
+            - application/vnd.api+json
+            - text/plain
+            - text/json
+            - application/x-ndjson
