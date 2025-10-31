@@ -20,23 +20,27 @@ Features
 // config/bundles.php
 return [
     // ...
-    SavinMikhail\\ResponseProfilerBundle\\ResponseProfilerBundle::class => ['dev' => true],
+    SavinMikhail\\ResponseProfilerBundle\\ResponseProfilerBundle::class => [
+        'dev' => true,
+    ],
 ];
 ```
 
-3) Optional config (dev): `config/packages/dev/response_profiler.yaml`
+3) Configuration (`config/packages/response_profiler.yaml`) is installed automatically by Flex and scoped to dev via `when@dev`. Adjust the values to taste:
 
 ```yaml
-response_profiler:
-  enabled: true
-  max_length: 262144           # bytes (256 KB)
-  allowed_mime_types:
-    - application/json
-    - application/ld+json
-    - application/problem+json
-    - application/vnd.api+json
-    - text/plain
-    - text/json
+when@dev:
+    response_profiler:
+        enabled: true
+        max_length: 262144           # bytes (256 KB)
+        allowed_mime_types:
+            - application/json
+            - application/ld+json
+            - application/problem+json
+            - application/vnd.api+json
+            - text/plain
+            - text/json
+            - application/x-ndjson
 ```
 
 ### Usage
