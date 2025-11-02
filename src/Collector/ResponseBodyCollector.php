@@ -17,6 +17,9 @@ use function in_array;
 use function is_string;
 use function strlen;
 
+/**
+ * @no-named-arguments
+ */
 final class ResponseBodyCollector extends DataCollector
 {
     /**

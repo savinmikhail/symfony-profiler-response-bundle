@@ -18,6 +18,9 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 use function dirname;
 
+/**
+ * @no-named-arguments
+ */
 final class TestKernel extends Kernel
 {
     use MicroKernelTrait;

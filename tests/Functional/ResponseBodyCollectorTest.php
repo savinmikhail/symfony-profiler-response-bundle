@@ -9,6 +9,9 @@ use SavinMikhail\ResponseProfilerBundle\Collector\ResponseBodyCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 
+/**
+ * @no-named-arguments
+ */
 final class ResponseBodyCollectorTest extends TestCase
 {
     private ?TestKernel $kernel = null;
