@@ -13,35 +13,17 @@ Features
 - Pretty-prints JSON when possible
 
 ### Installation
-1) `composer req --dev savinmikhail/symfony-profiler-response-bundle`
-2) Register the bundle in your app (though flex should do it for you):
+1. Install the bundle:
+    ```bash
+       composer require --dev savinmikhail/symfony-profiler-response-bundle
+    ```
 
-```php
-// config/bundles.php
-return [
-    // ...
-    SavinMikhail\\ResponseProfilerBundle\\ResponseProfilerBundle::class => [
-        'dev' => true,
-    ],
-];
-```
+2. Copy the configuration file:
+    ```bash
+       cp vendor/savinmikhail/symfony-profiler-response-bundle/config/packages/response_profiler.yaml config/packages/
+    ```
 
-3) Configuration (`config/packages/response_profiler.yaml`) is installed automatically by Flex and scoped to dev via `when@dev`. Adjust the values to taste:
-
-```yaml
-when@dev:
-    response_profiler:
-        enabled: true
-        max_length: 262144           # bytes (256 KB)
-        allowed_mime_types:
-            - application/json
-            - application/ld+json
-            - application/problem+json
-            - application/vnd.api+json
-            - text/plain
-            - text/json
-            - application/x-ndjson
-```
+3. The bundle will be automatically registered by Symfony Flex.
 
 ### Usage
 - In the Web Profiler, open any request and look for the new "Response Body" tab.

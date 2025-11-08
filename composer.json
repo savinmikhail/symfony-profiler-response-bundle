@@ -43,7 +43,8 @@
   "config": {
     "allow-plugins": {
       "bamarni/composer-bin-plugin": true,
-      "ergebnis/composer-normalize": true
+      "ergebnis/composer-normalize": true,
+      "symfony/flex": true
     },
     "sort-packages": true
   },
@@ -52,16 +53,6 @@
       "bin-links": true,
       "forward-command": true,
       "target-directory": "vendor-bin"
-    },
-    "symfony": {
-      "bundle": {
-        "SavinMikhail\\ResponseProfilerBundle\\ResponseProfilerBundle": [
-          "dev"
-        ]
-      },
-      "copy-from-package": {
-        "config/packages/response_profiler.yaml": "%CONFIG_DIR%/packages/response_profiler.yaml"
-      }
     }
   }
 }

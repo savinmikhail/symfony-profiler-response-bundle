@@ -1,0 +1,8 @@
+{
+  "bundles": {
+    "SavinMikhail\\ResponseProfilerBundle\\ResponseProfilerBundle": ["dev"]
+  },
+  "copy-from-recipe": {
+    "config/": "%CONFIG_DIR%/"
+  }
+}
